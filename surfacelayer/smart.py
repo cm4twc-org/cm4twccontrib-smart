@@ -71,6 +71,11 @@ class SMART(SurfaceLayerComponent):
             'units': 'kg m-2'
         }
     }
+    _outputs_info = {
+        'actual_evapotranspiration': {
+            'units': 'kg m-2 s-1'
+        }
+    }
 
     def initialise(self):
         pass
@@ -141,7 +146,7 @@ class SMART(SurfaceLayerComponent):
             },
             # component outputs
             {
-                'evapotranspiration': actual_evapotranspiration
+                'actual_evapotranspiration': actual_evapotranspiration
             }
         )
 
