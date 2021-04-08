@@ -48,6 +48,12 @@ class SMART(OpenWaterComponent):
             'units': 'kg m-2'
         }
     }
+    _outputs_info = {
+        'outgoing_water_volume_transport_along_river_channel': {
+            'units': 'm3 s-1',
+            'description': 'streamflow at outlet'
+        }
+    }
 
     def initialise(self,
                    # component states
