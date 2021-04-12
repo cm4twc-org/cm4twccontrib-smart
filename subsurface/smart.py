@@ -44,7 +44,7 @@ class SMART(SubSurfaceComponent):
     """
 
     _inputs_info = {
-        'surface_area': {
+        'cell_area': {
             'units': 'm2',
             'kind': 'static'
         }
@@ -123,7 +123,7 @@ class SMART(SubSurfaceComponent):
             transpiration, evaporation_soil_surface, evaporation_ponded_water,
             throughfall, snowmelt,
             # component inputs
-            surface_area,
+            cell_area,
             # component parameters
             theta_c, theta_h, theta_d, theta_s, theta_z, theta_sk, theta_fk,
             theta_gk,

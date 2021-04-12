@@ -48,15 +48,15 @@ class SMART(SurfaceLayerComponent):
     """
 
     _inputs_info = {
-        'precipitation': {
+        'rainfall_flux': {
             'units': 'kg m-2 s-1',
             'kind': 'dynamic'
         },
-        'potential_evapotranspiration': {
+        'potential_water_evapotranspiration_flux': {
             'units': 'kg m-2 s-1',
             'kind': 'dynamic'
         },
-        'surface_area': {
+        'cell_area': {
             'units': 'm2',
             'kind': 'static'
         }
@@ -72,7 +72,7 @@ class SMART(SurfaceLayerComponent):
         }
     }
     _outputs_info = {
-        'actual_evapotranspiration': {
+        'actual_water_evapotranspiration_flux': {
             'units': 'kg m-2 s-1'
         }
     }
@@ -84,8 +84,8 @@ class SMART(SurfaceLayerComponent):
             # from exchanger
             soil_water_stress, water_level,
             # component inputs
-            precipitation, potential_evapotranspiration,
-            surface_area,
+            rainfall_flux, potential_water_evapotranspiration_flux,
+            cell_area,
             # component parameters
             theta_t, theta_z,
             # component states
@@ -93,9 +93,9 @@ class SMART(SurfaceLayerComponent):
             **kwargs):
 
         # apply parameter T to rainfall data (aerial rainfall correction)
-        corrected_rain = precipitation * theta_t
+        corrected_rain = rainfall_flux * theta_t
         # determine limiting conditions
-        rain_minus_peva = corrected_rain - potential_evapotranspiration
+        rain_minus_peva = corrected_rain - potential_water_evapotranspiration_flux
         energy_limited = rain_minus_peva >= 0.0
         water_limited = ~energy_limited
 
@@ -131,7 +131,7 @@ class SMART(SurfaceLayerComponent):
         # -------------------------------------------------------------<
 
         # calculate actual evapotranspiration
-        actual_evapotranspiration = (potential_evapotranspiration +
+        actual_evapotranspiration = (potential_water_evapotranspiration_flux +
                                      soil_moisture_contribution)
 
         return (
@@ -146,7 +146,7 @@ class SMART(SurfaceLayerComponent):
             },
             # component outputs
             {
-                'actual_evapotranspiration': actual_evapotranspiration
+                'actual_water_evapotranspiration_flux': actual_evapotranspiration
             }
         )
 
