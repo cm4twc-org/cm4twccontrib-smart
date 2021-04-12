@@ -55,10 +55,6 @@ class SMART(SurfaceLayerComponent):
         'potential_water_evapotranspiration_flux': {
             'units': 'kg m-2 s-1',
             'kind': 'dynamic'
-        },
-        'cell_area': {
-            'units': 'm2',
-            'kind': 'static'
         }
     }
     _parameters_info = {
@@ -85,7 +81,6 @@ class SMART(SurfaceLayerComponent):
             soil_water_stress, water_level,
             # component inputs
             rainfall_flux, potential_water_evapotranspiration_flux,
-            cell_area,
             # component parameters
             theta_t, theta_z,
             # component states

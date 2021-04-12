@@ -43,12 +43,6 @@ class SMART(SubSurfaceComponent):
     :copyright: 2020, University College Dublin
     """
 
-    _inputs_info = {
-        'cell_area': {
-            'units': 'm2',
-            'kind': 'static'
-        }
-    }
     _parameters_info = {
         'theta_c': {
             'description': 'evaporation decay coefficient',
@@ -122,8 +116,6 @@ class SMART(SubSurfaceComponent):
             # from exchanger
             transpiration, evaporation_soil_surface, evaporation_ponded_water,
             throughfall, snowmelt,
-            # component inputs
-            cell_area,
             # component parameters
             theta_c, theta_h, theta_d, theta_s, theta_z, theta_sk, theta_fk,
             theta_gk,
