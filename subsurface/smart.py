@@ -167,14 +167,16 @@ class SMART(SubSurfaceComponent):
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore", category=RuntimeWarning)
                 # there is enough space in layer to hold entire excess rain
-                layer_crt[excess_rain <= layer_prv] = \
-                    (layer_prv[excess_rain <= layer_prv] +
-                     excess_rain[excess_rain <= layer_prv])
+                layer_crt[excess_rain <= layer_prv] = (
+                    layer_prv[excess_rain <= layer_prv]
+                    + excess_rain[excess_rain <= layer_prv]
+                )
                 excess_rain[excess_rain <= layer_prv] = 0.0
                 # there is not enough space in layer to hold entire excess rain
                 layer_crt[excess_rain > layer_prv] = layer_capacity
-                excess_rain[excess_rain > layer_prv] -= \
+                excess_rain[excess_rain > layer_prv] -= (
                     space_in_layer[excess_rain > layer_prv]
+                )
 
         # calculate saturation excess from remaining excess rainfall
         # sat. excess contribution (if not 0) to quick soil matrix runoff store
@@ -208,10 +210,12 @@ class SMART(SubSurfaceComponent):
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore", category=RuntimeWarning)
                 enough_moisture = leak_shallow_gw_flow < layer_crt
-            shallow_gw_flow[enough_moisture] += \
+            shallow_gw_flow[enough_moisture] += (
                 leak_shallow_gw_flow[enough_moisture]
-            layer_crt[enough_moisture] -= \
+            )
+            layer_crt[enough_moisture] -= (
                 leak_shallow_gw_flow[enough_moisture]
+            )
 
             # leak to deep groundwater flow
             # soil moisture outflow reducing exponentially upwards
@@ -245,14 +249,14 @@ class SMART(SubSurfaceComponent):
                 enough_moisture = unmet_peva <= layer_prv
                 not_enough_moisture = unmet_peva > layer_prv
             # there is enough moisture in layer to satisfy unmet ET
-            layer_crt[enough_moisture] = \
-                (layer_prv[enough_moisture] -
-                 unmet_peva[enough_moisture])
+            layer_crt[enough_moisture] = (layer_prv[enough_moisture]
+                                          - unmet_peva[enough_moisture])
             unmet_peva[enough_moisture] = 0.0
             # there is not enough moisture in layer to satisfy unmet ET
-            unmet_peva[not_enough_moisture] = \
-                (unmet_peva[not_enough_moisture] -
-                 layer_crt[not_enough_moisture]) * theta_c
+            unmet_peva[not_enough_moisture] = theta_c * (
+                unmet_peva[not_enough_moisture]
+                - layer_crt[not_enough_moisture]
+            )
             layer_crt[not_enough_moisture] = 0.0
 
         # route runoff
