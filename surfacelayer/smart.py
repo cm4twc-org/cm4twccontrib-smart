@@ -1,8 +1,7 @@
 import numpy as np
-import warnings
 
-from cm4twc import SurfaceLayerComponent
-from cm4twc import dtype_float
+from cm4twc.components import SurfaceLayerComponent
+from cm4twc.settings import dtype_float
 
 
 class SMART(SurfaceLayerComponent):
@@ -87,61 +86,77 @@ class SMART(SurfaceLayerComponent):
             # component constants
             **kwargs):
 
+        dt = self.timedelta_in_seconds
+
         # apply parameter T to rainfall data (aerial rainfall correction)
         corrected_rain = rainfall_flux * theta_t
+
         # determine limiting conditions
         rain_minus_peva = corrected_rain - potential_water_evapotranspiration_flux
-        energy_limited = rain_minus_peva >= 0.0
+        energy_limited = rain_minus_peva > 0.0
         water_limited = ~energy_limited
 
         # --------------------------------------------------------------
-        # during energy-limited conditions
+        # under energy-limited conditions
         # >-------------------------------------------------------------
-        effective_rain = np.where(energy_limited,
-                                  rain_minus_peva,
-                                  np.nan)
+
+        effective_rain = np.where(
+            energy_limited, rain_minus_peva, 0.0
+        )
+
         # -------------------------------------------------------------<
 
         # --------------------------------------------------------------
-        # during water-limited conditions
+        # under water-limited conditions
         # >-------------------------------------------------------------
+
         # ignore cells where there is rain excess
-        unmet_peva = np.where(water_limited,
-                              -rain_minus_peva,
-                              np.nan)
-        # provisionally set contribution as total available moisture
-        soil_moisture = soil_water_stress * theta_z
-        soil_moisture_contribution = np.where(water_limited,
-                                              soil_moisture,
-                                              np.nan)
-        # turn off warnings because np.nan in comparison will raise one
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", category=RuntimeWarning)
-            # limit contribution to unmet ET where there is moisture excess
-            soil_moisture_contribution = (
-                np.where(soil_moisture_contribution >= unmet_peva,
-                         unmet_peva,
-                         soil_moisture_contribution)
-            )
+        unmet_peva = np.where(
+            water_limited, -rain_minus_peva, 0.0
+        )
+
+        # provisionally set soil evaporation as total available moisture
+        soil_water = soil_water_stress * theta_z
+        max_soil_evaporation = np.where(
+            water_limited, soil_water / dt, 0.0
+        )
+
+        # limit contribution to unmet ET where there is moisture excess
+        soil_evaporation = np.where(
+            max_soil_evaporation >= unmet_peva,
+            unmet_peva,
+            max_soil_evaporation
+        )
+
         # -------------------------------------------------------------<
 
         # calculate actual evapotranspiration
-        actual_evapotranspiration = (potential_water_evapotranspiration_flux +
-                                     soil_moisture_contribution)
+        actual_evapotranspiration = np.where(
+            energy_limited,
+            potential_water_evapotranspiration_flux,
+            corrected_rain + soil_evaporation
+        )
 
         return (
             # to exchanger
             {
-                'throughfall': effective_rain,
-                'snowmelt': np.zeros(self.spaceshape, dtype_float()),
-                'transpiration': np.zeros(self.spaceshape, dtype_float()),
-                'evaporation_soil_surface': soil_moisture_contribution,
-                'evaporation_ponded_water': np.zeros(self.spaceshape, dtype_float()),
-                'evaporation_openwater': np.zeros(self.spaceshape, dtype_float())
+                'throughfall': 
+                    effective_rain,
+                'snowmelt': 
+                    np.zeros(self.spaceshape, dtype_float()),
+                'transpiration': 
+                    np.zeros(self.spaceshape, dtype_float()),
+                'evaporation_soil_surface': 
+                    soil_evaporation,
+                'evaporation_ponded_water': 
+                    np.zeros(self.spaceshape, dtype_float()),
+                'evaporation_openwater': 
+                    np.zeros(self.spaceshape, dtype_float())
             },
             # component outputs
             {
-                'actual_water_evapotranspiration_flux': actual_evapotranspiration
+                'actual_water_evapotranspiration_flux': 
+                    actual_evapotranspiration
             }
         )
 

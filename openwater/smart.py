@@ -1,6 +1,6 @@
 import numpy as np
 
-from cm4twc import OpenWaterComponent
+from cm4twc.components import OpenWaterComponent
 
 
 class SMART(OpenWaterComponent):
@@ -37,6 +37,13 @@ class SMART(OpenWaterComponent):
     :copyright: 2020, University College Dublin
     """
 
+    _inputs_info = {
+        'cell_area': {
+            'description': 'surface area of the cell',
+            'units': 'm2',
+            'kind': 'static'
+        }
+    }
     _parameters_info = {
         'theta_rk': {
             'description': 'channel reservoir residence time',
@@ -46,6 +53,12 @@ class SMART(OpenWaterComponent):
     _states_info = {
         'river_store': {
             'units': 'kg m-2'
+        }
+    }
+    _constants_info = {
+        'rho_water': {
+            'description': 'volumetric mass density of liquid water',
+            'units': 'kg m-3'
         }
     }
     _outputs_info = {
@@ -59,47 +72,55 @@ class SMART(OpenWaterComponent):
                    # component states
                    river_store,
                    **kwargs):
-        # initialise linear reservoir
-        river_store[-1][:] = 0
+        pass
 
     def run(self,
             # from exchanger
             surface_runoff, subsurface_runoff, evaporation_openwater,
+            # component inputs
+            cell_area,
             # component parameters
             theta_rk,
             # component states
             river_store,
             # component constants
+            rho_water=1e3,
             **kwargs):
 
         dt = self.timedelta_in_seconds
 
+        total_runoff = surface_runoff + subsurface_runoff
+
         # provisionally calculate river flow
-        river_flow = river_store[-1] / theta_rk
+        river_outflow = river_store[-1] / theta_rk
 
         # provisionally calculate new river store state
-        store = (river_store[-1]
-                 + ((surface_runoff + subsurface_runoff) - river_flow) * dt)
+        store = river_store[-1] + (total_runoff - river_outflow) * dt
 
         # check whether store has gone negative
-        river_flow = np.where(store < 0,
-                              # allow max outflow at 95% of what was in store
-                              0.95 * ((surface_runoff + subsurface_runoff)
-                                      + (river_store[-1] / dt)),
-                              river_flow)
-        river_store[0][:] = (
-                river_store[-1]
-                + ((surface_runoff + subsurface_runoff) - river_flow) * dt
+        river_outflow = np.where(
+            store < 0,
+            # allow max outflow at 95% of what was in store
+            0.95 * (total_runoff + river_store[-1] / dt),
+            river_outflow
         )
+        river_store[0][:] = (
+            river_store[-1] + (total_runoff - river_outflow) * dt
+        )
+
+        # convert [kg m-2 s-1] to [m3 s-1]
+        river_outflow = river_outflow / rho_water * cell_area
 
         return (
             # to exchanger
             {
-                'water_level': river_store
+                'water_level': 
+                    river_store
             },
             # component outputs
             {
-                'outgoing_water_volume_transport_along_river_channel': river_flow
+                'outgoing_water_volume_transport_along_river_channel': 
+                    river_outflow
             }
         )
 

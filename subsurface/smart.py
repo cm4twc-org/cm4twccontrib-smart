@@ -1,7 +1,7 @@
 import numpy as np
-import warnings
 
-from cm4twc import SubSurfaceComponent
+from cm4twc.components import SubSurfaceComponent
+from cm4twc.settings import dtype_float
 
 
 class SMART(SubSurfaceComponent):
@@ -104,14 +104,10 @@ class SMART(SubSurfaceComponent):
                    soil_layers, overland_store, drain_store,
                    inter_store, shallow_gw_store, deep_gw_store,
                    **kwargs):
-        # initialise soil layers and linear reservoirs
-        soil_layers[-1][:] = 0
-        overland_store[-1][:] = 0
-        drain_store[-1][:] = 0
-        inter_store[-1][:] = 0
-        shallow_gw_store[-1][:] = 0
-        deep_gw_store[-1][:] = 0
 
+        # initialise soil layers to be half full
+        soil_layers[-1][:] = 105.25734595830215 / 6 / 2  # kg m-2
+        
     def run(self,
             # from exchanger
             transpiration, evaporation_soil_surface, evaporation_ponded_water,
@@ -135,163 +131,181 @@ class SMART(SubSurfaceComponent):
                       evaporation_ponded_water) * dt
 
         # determine limiting conditions
-        water_limited = np.isnan(excess_rain)
-        energy_limited = ~water_limited
+        energy_limited = excess_rain > 0
+        water_limited = ~energy_limited
 
         # initialise current soil layers to their level at previous time step
         soil_layers[0][:] = soil_layers[-1]
 
         # --------------------------------------------------------------
-        # during energy-limited conditions
+        # under energy-limited conditions
         # >-------------------------------------------------------------
+
         # calculate total antecedent soil moisture
         soil_water = np.sum(soil_layers[-1], axis=-1)
 
         # calculate surface runoff using quick runoff parameter H and
         # relative soil moisture content
         theta_h_prime = theta_h * (soil_water / theta_z)
-        overland_flow = theta_h_prime * excess_rain  # excess rainfall
-        # contribution to quick surface runoff store
-        excess_rain -= overland_flow  # remainder that infiltrates
+        # excess rainfall contribution to quick surface runoff store
+        overland_flow = theta_h_prime * excess_rain
+        # remainder that infiltrates
+        excess_rain -= overland_flow
 
         # calculate percolation through soil layers
         # (from top layer [1] to bottom layer [6])
-        layer_capacity = theta_z / 6.0
+        layer_capacity = theta_z / 6.
         for i in range(6):
-            layer_prv = soil_layers[-1][..., i]
-            layer_crt = soil_layers[0][..., i]
+            layer_level = soil_layers[0][..., i]
 
             # determine space available in layer before reaching full capacity
-            space_in_layer = layer_capacity - soil_layers[-1][..., i]
-            # turn off warnings because np.nan in comparison will raise one
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore", category=RuntimeWarning)
-                # there is enough space in layer to hold entire excess rain
-                layer_crt[excess_rain <= layer_prv] = (
-                    layer_prv[excess_rain <= layer_prv]
-                    + excess_rain[excess_rain <= layer_prv]
-                )
-                excess_rain[excess_rain <= layer_prv] = 0.0
-                # there is not enough space in layer to hold entire excess rain
-                layer_crt[excess_rain > layer_prv] = layer_capacity
-                excess_rain[excess_rain > layer_prv] -= (
-                    space_in_layer[excess_rain > layer_prv]
-                )
+            layer_space = layer_capacity - layer_level
+
+            enough_water = excess_rain <= layer_space
+
+            # enough space in layer to hold entire excess rain
+            layer_level[:] = np.where(
+                energy_limited & enough_water,
+                layer_level + excess_rain,
+                layer_level
+            )
+            excess_rain[energy_limited & enough_water] = 0.
+
+            # not enough space in layer to hold entire excess rain
+            layer_level[energy_limited & ~enough_water] = layer_capacity
+            excess_rain = np.where(
+                energy_limited & ~enough_water,
+                excess_rain - layer_space,
+                excess_rain
+            )
 
         # calculate saturation excess from remaining excess rainfall
         # sat. excess contribution (if not 0) to quick soil matrix runoff store
         drain_flow = theta_d * excess_rain
         # sat. excess contribution (if not 0) to slow soil matrix runoff store
         inter_flow = (1.0 - theta_d) * excess_rain
+
+        # -------------------------------------------------------------<
+
         # calculate leak from soil layers
         # (i.e. piston flow becoming active during rainfall events)
         theta_s_prime = theta_s * (soil_water / theta_z)
 
         # calculate soil moisture contributions to runoff stores
-        shallow_gw_flow = np.where(energy_limited, 0.0, np.nan)
-        deep_gw_flow = np.where(energy_limited, 0.0, np.nan)
+        shallow_gw_flow = np.zeros(self.spaceshape, dtype_float())
+        deep_gw_flow = np.zeros(self.spaceshape, dtype_float())
+
         for i in range(6):
-            layer_crt = soil_layers[0][..., i]
+            layer_level = soil_layers[0][..., i]
 
             # leak to interflow
-            # soil moisture outflow reducing exponentially downwards
-            leak_interflow = layer_crt * (theta_s_prime ** (i + 1))
-            # leaking if enough soil moisture
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore", category=RuntimeWarning)
-                enough_moisture = leak_interflow < layer_crt
-            inter_flow[enough_moisture] += leak_interflow[enough_moisture]
-            layer_crt[enough_moisture] -= leak_interflow[enough_moisture]
+            leak_interflow = np.where(
+                energy_limited,
+                # soil moisture outflow reducing exponentially downwards
+                layer_level * (theta_s_prime ** (i + 1)),
+                # no soil moisture contribution to runoff store
+                0
+            )
+            inter_flow += leak_interflow
+            layer_level[:] = layer_level - leak_interflow
 
             # leak to shallow groundwater flow
-            # soil moisture outflow reducing linearly downwards
-            leak_shallow_gw_flow = layer_crt * (theta_s_prime / (i + 1))
-            # leaking if enough soil moisture
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore", category=RuntimeWarning)
-                enough_moisture = leak_shallow_gw_flow < layer_crt
-            shallow_gw_flow[enough_moisture] += (
-                leak_shallow_gw_flow[enough_moisture]
+            leak_shallow_gw_flow = np.where(
+                energy_limited,
+                # soil moisture outflow reducing linearly downwards
+                layer_level * (theta_s_prime / (i + 1)),
+                # no soil moisture contribution to runoff store
+                0
             )
-            layer_crt[enough_moisture] -= (
-                leak_shallow_gw_flow[enough_moisture]
-            )
+            shallow_gw_flow += leak_shallow_gw_flow
+            layer_level[:] = layer_level - leak_shallow_gw_flow
 
             # leak to deep groundwater flow
-            # soil moisture outflow reducing exponentially upwards
-            leak_deep_gw_flow = layer_crt * (theta_s_prime ** (6 - i))
-            # leaking if enough soil moisture
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore", category=RuntimeWarning)
-                enough_moisture = leak_deep_gw_flow < layer_crt
-            deep_gw_flow[enough_moisture] += leak_deep_gw_flow[enough_moisture]
-            layer_crt[enough_moisture] -= leak_deep_gw_flow[enough_moisture]
-        # -------------------------------------------------------------<
+            leak_deep_gw_flow = np.where(
+                energy_limited,
+                # soil moisture outflow reducing exponentially upwards
+                layer_level * (theta_s_prime ** (6 - i)),
+                # no soil moisture contribution to runoff store
+                0
+            )
+            deep_gw_flow += leak_deep_gw_flow
+            layer_level[:] = layer_level - leak_deep_gw_flow
 
         # --------------------------------------------------------------
-        # during water-limited conditions
+        # under water-limited conditions
         # >-------------------------------------------------------------
-        # no soil moisture contribution to runoff stores (replace np.nan by 0)
-        overland_flow[water_limited] = 0.0
-        drain_flow[water_limited] = 0.0
-        inter_flow[water_limited] = 0.0
-        shallow_gw_flow[water_limited] = 0.0
-        deep_gw_flow[water_limited] = 0.0
 
         # attempt to satisfy PE from soil layers
         # (from top layer [1] to bottom layer [6])
         for i in range(6):
-            layer_prv = soil_layers[-1][..., i]
-            layer_crt = soil_layers[0][..., i]
+            layer_level = soil_layers[0][..., i]
 
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore", category=RuntimeWarning)
-                enough_moisture = unmet_peva <= layer_prv
-                not_enough_moisture = unmet_peva > layer_prv
-            # there is enough moisture in layer to satisfy unmet ET
-            layer_crt[enough_moisture] = (layer_prv[enough_moisture]
-                                          - unmet_peva[enough_moisture])
-            unmet_peva[enough_moisture] = 0.0
-            # there is not enough moisture in layer to satisfy unmet ET
-            unmet_peva[not_enough_moisture] = theta_c * (
-                unmet_peva[not_enough_moisture]
-                - layer_crt[not_enough_moisture]
+            enough_moisture = unmet_peva <= layer_level
+
+            # enough soil moisture in layer
+            layer_level[:] = np.where(
+                water_limited & enough_moisture,
+                layer_level - unmet_peva,
+                layer_level
             )
-            layer_crt[not_enough_moisture] = 0.0
+            unmet_peva[water_limited & enough_moisture] = 0.
+
+            # not enough soil moisture in layer
+            layer_level[water_limited & ~enough_moisture] = 0.
+            unmet_peva = np.where(
+                water_limited & ~enough_moisture,
+                theta_c * (unmet_peva - layer_level),
+                unmet_peva
+            )
+
+        # -------------------------------------------------------------<
 
         # route runoff
+
         # overland
         overland_runoff = overland_store[-1] / theta_sk
-        overland_store[0][:] = (overland_store[-1] + overland_flow -
-                                overland_runoff * dt)
-        overland_store[0][overland_store[0] < 0] = 0.0
+        overland_store[0][:] = (
+            overland_store[-1] + overland_flow - overland_runoff * dt
+        )
+        overland_store[0] *= overland_store[0] > 0
+
         # drain
         drain_runoff = drain_store[-1] / theta_sk
-        drain_store[0][:] = (drain_store[-1] + drain_flow -
-                             drain_runoff * dt)
-        drain_store[0][drain_store[0] < 0] = 0.0
+        drain_store[0][:] = (
+            drain_store[-1] + drain_flow - drain_runoff * dt
+        )
+        drain_store[0] *= drain_store[0] > 0
+
         # inter
         inter_runoff = inter_store[-1] / theta_fk
-        inter_store[0][:] = (inter_store[-1] + inter_flow -
-                             inter_runoff * dt)
-        inter_store[0][inter_store[0] < 0] = 0.0
+        inter_store[0][:] = (
+            inter_store[-1] + inter_flow - inter_runoff * dt
+        )
+        inter_store[0] *= inter_store[0] > 0
+
         # shallow groundwater
         shallow_gw_runoff = shallow_gw_store[-1] / theta_gk
-        shallow_gw_store[0][:] = (shallow_gw_store[-1] + shallow_gw_flow -
-                                  shallow_gw_runoff * dt)
-        shallow_gw_store[0][shallow_gw_store[0] < 0] = 0.0
+        shallow_gw_store[0][:] = (
+            shallow_gw_store[-1] + shallow_gw_flow - shallow_gw_runoff * dt
+        )
+        shallow_gw_store[0] *= shallow_gw_store[0] > 0
+
         # deep groundwater
         deep_gw_runoff = deep_gw_store[-1] / theta_gk
-        deep_gw_store[0][:] = (deep_gw_store[-1] + deep_gw_flow -
-                               deep_gw_runoff * dt)
-        deep_gw_store[0][deep_gw_store[0] < 0] = 0.0
+        deep_gw_store[0][:] = (
+            deep_gw_store[-1] + deep_gw_flow - deep_gw_runoff * dt
+        )
+        deep_gw_store[0] *= deep_gw_store[0] > 0
 
         return (
             # to exchanger
             {
-                'surface_runoff': overland_runoff + drain_runoff + inter_runoff,
-                'subsurface_runoff': shallow_gw_runoff + deep_gw_runoff,
-                'soil_water_stress': np.sum(soil_layers[0], axis=-1) / theta_z
+                'surface_runoff': 
+                    overland_runoff + drain_runoff + inter_runoff,
+                'subsurface_runoff': 
+                    shallow_gw_runoff + deep_gw_runoff,
+                'soil_water_stress': 
+                    np.sum(soil_layers[0], axis=-1) / theta_z
             },
             # component outputs
             {}
