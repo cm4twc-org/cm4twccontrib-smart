@@ -92,7 +92,9 @@ class SMART(SurfaceLayerComponent):
         corrected_rain = rainfall_flux * theta_t
 
         # determine limiting conditions
-        rain_minus_peva = corrected_rain - potential_water_evapotranspiration_flux
+        rain_minus_peva = (
+            corrected_rain - potential_water_evapotranspiration_flux
+        )
         energy_limited = rain_minus_peva > 0.0
         water_limited = ~energy_limited
 

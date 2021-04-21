@@ -110,11 +110,11 @@ class SMART(SubSurfaceComponent):
         
     def run(self,
             # from exchanger
-            transpiration, evaporation_soil_surface, evaporation_ponded_water,
-            throughfall, snowmelt,
+            transpiration, evaporation_soil_surface,
+            evaporation_ponded_water, throughfall, snowmelt,
             # component parameters
-            theta_c, theta_h, theta_d, theta_s, theta_z, theta_sk, theta_fk,
-            theta_gk,
+            theta_c, theta_h, theta_d, theta_s, theta_z, theta_sk,
+            theta_fk, theta_gk,
             # component states
             soil_layers, overland_store, drain_store,
             inter_store, shallow_gw_store, deep_gw_store,
@@ -134,7 +134,7 @@ class SMART(SubSurfaceComponent):
         energy_limited = excess_rain > 0
         water_limited = ~energy_limited
 
-        # initialise current soil layers to their level at previous time step
+        # initialise current soil layers to their level at previous step
         soil_layers[0][:] = soil_layers[-1]
 
         # --------------------------------------------------------------
@@ -158,7 +158,7 @@ class SMART(SubSurfaceComponent):
         for i in range(6):
             layer_level = soil_layers[0][..., i]
 
-            # determine space available in layer before reaching full capacity
+            # determine space in layer before reaching full capacity
             layer_space = layer_capacity - layer_level
 
             enough_water = excess_rain <= layer_space
@@ -180,9 +180,9 @@ class SMART(SubSurfaceComponent):
             )
 
         # calculate saturation excess from remaining excess rainfall
-        # sat. excess contribution (if not 0) to quick soil matrix runoff store
+        # sat. excess contrib. (if not 0) to quick soil runoff store
         drain_flow = theta_d * excess_rain
-        # sat. excess contribution (if not 0) to slow soil matrix runoff store
+        # sat. excess contrib. (if not 0) to slow soil runoff store
         inter_flow = (1.0 - theta_d) * excess_rain
 
         # -------------------------------------------------------------<
@@ -286,7 +286,8 @@ class SMART(SubSurfaceComponent):
         # shallow groundwater
         shallow_gw_runoff = shallow_gw_store[-1] / theta_gk
         shallow_gw_store[0][:] = (
-            shallow_gw_store[-1] + shallow_gw_flow - shallow_gw_runoff * dt
+            shallow_gw_store[-1] + shallow_gw_flow
+            - shallow_gw_runoff * dt
         )
         shallow_gw_store[0] *= shallow_gw_store[0] > 0
 
