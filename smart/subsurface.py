@@ -104,7 +104,9 @@ class SMART(SubSurfaceComponent):
                    soil_layers, overland_store, drain_store,
                    inter_store, shallow_gw_store, deep_gw_store,
                    **kwargs):
-        pass
+
+        # initialise soil layers to be half full
+        soil_layers[-1][:] = 105.25734595830215 / 6 / 2  # kg m-2
         
     def run(self,
             # from exchanger
