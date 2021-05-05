@@ -173,7 +173,11 @@ class SMART(SubSurfaceComponent):
             excess_rain[energy_limited & enough_water] = 0.
 
             # not enough space in layer to hold entire excess rain
-            layer_level[energy_limited & ~enough_water] = layer_capacity
+            layer_level[:] = np.where(
+                energy_limited & ~enough_water,
+                layer_capacity,
+                layer_level
+            )
             excess_rain = np.where(
                 energy_limited & ~enough_water,
                 excess_rain - layer_space,
