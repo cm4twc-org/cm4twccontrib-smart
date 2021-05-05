@@ -35,8 +35,8 @@ class TestContribution(unittest.TestCase):
             spacedomain=sd,
             dataset=ds,
             parameters={
-                'theta_t': 1.0,  # 1
-                'theta_z': 105.25734595830215  # kg m-2
+                'theta_t': (1.0, '1'),
+                'theta_z': (105.25734595830215, 'kg m-2')
             }
         )
 
@@ -46,14 +46,14 @@ class TestContribution(unittest.TestCase):
             spacedomain=sd,
             dataset=None,
             parameters={
-                'theta_c': 1.0,  # 1
-                'theta_h': 0.20845296027652363,  # 1
-                'theta_d': 0.24606006380093334,  # 1
-                'theta_s': 0.00012296588050682812,  # 1
-                'theta_z': 105.25734595830215,  # kg m-2
-                'theta_sk': 46.81961454361724 * 3600,  # s
-                'theta_fk': 315.5490902162102 * 3600,  # s
-                'theta_gk': 1066.7332319333473 * 3600  # s
+                'theta_c': (1.0, '1'),  # 1
+                'theta_h': (0.20845296027652363, '1'),  # 1
+                'theta_d': (0.24606006380093334, '1'),  # 1
+                'theta_s': (0.00012296588050682812, '1'),  # 1
+                'theta_z': (105.25734595830215, 'kg m-2'),  # kg m-2
+                'theta_sk': (46.81961454361724 * 3600, 's'),  # s
+                'theta_fk': (315.5490902162102 * 3600, 's'),  # s
+                'theta_gk': (1066.7332319333473 * 3600, 's')  # s
             }
         )
 
@@ -63,7 +63,7 @@ class TestContribution(unittest.TestCase):
             spacedomain=sd,
             dataset=ds2,
             parameters={
-                'theta_rk': 10.640277777777778 * 3600  # s
+                'theta_rk': (10.640277777777778 * 3600, 's')  # s
             },
             records={
                 'outgoing_water_volume_transport_along_river_channel': {
