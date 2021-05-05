@@ -71,7 +71,7 @@ class SMART(SurfaceLayerComponent):
         }
     }
 
-    def initialise(self):
+    def initialise(self, **kwargs):
         pass
 
     def run(self,
