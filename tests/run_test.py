@@ -29,14 +29,25 @@ class TestContribution(unittest.TestCase):
 
         ds2 = cm4twc.DataSet('in/cell_area.nc')
 
+        theta_t = (1.0, '1')
+        theta_c = (1.0, '1')
+        theta_h = (0.20845296027652363, '1')
+        theta_d = (0.24606006380093334, '1')
+        theta_s = (0.00012296588050682812, '1')
+        theta_z = (105.25734595830215, 'kg m-2')
+        theta_sk = (46.81961454361724 * 3600, 's')
+        theta_fk = (315.5490902162102 * 3600, 's')
+        theta_gk = (1066.7332319333473 * 3600, 's')
+        theta_rk = (10.640277777777778 * 3600, 's')
+
         sl = SMART_sl(
             saving_directory='out',
             timedomain=td,
             spacedomain=sd,
             dataset=ds,
             parameters={
-                'theta_t': (1.0, '1'),
-                'theta_z': (105.25734595830215, 'kg m-2')
+                'theta_t': theta_t,
+                'theta_z': theta_z
             }
         )
 
@@ -46,14 +57,14 @@ class TestContribution(unittest.TestCase):
             spacedomain=sd,
             dataset=None,
             parameters={
-                'theta_c': (1.0, '1'),  # 1
-                'theta_h': (0.20845296027652363, '1'),  # 1
-                'theta_d': (0.24606006380093334, '1'),  # 1
-                'theta_s': (0.00012296588050682812, '1'),  # 1
-                'theta_z': (105.25734595830215, 'kg m-2'),  # kg m-2
-                'theta_sk': (46.81961454361724 * 3600, 's'),  # s
-                'theta_fk': (315.5490902162102 * 3600, 's'),  # s
-                'theta_gk': (1066.7332319333473 * 3600, 's')  # s
+                'theta_c': theta_c,
+                'theta_h': theta_h,
+                'theta_d': theta_d,
+                'theta_s': theta_s,
+                'theta_z': theta_z,
+                'theta_sk': theta_sk,
+                'theta_fk': theta_fk,
+                'theta_gk': theta_gk
             }
         )
 
@@ -63,7 +74,7 @@ class TestContribution(unittest.TestCase):
             spacedomain=sd,
             dataset=ds2,
             parameters={
-                'theta_rk': (10.640277777777778 * 3600, 's')  # s
+                'theta_rk': theta_rk
             },
             records={
                 'outgoing_water_volume_transport_along_river_channel': {
