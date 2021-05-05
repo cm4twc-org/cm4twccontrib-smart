@@ -57,7 +57,8 @@ class SMART(OpenWaterComponent):
     _constants_info = {
         'rho_water': {
             'description': 'volumetric mass density of liquid water',
-            'units': 'kg m-3'
+            'units': 'kg m-3',
+            'default_value': 1e3
         }
     }
     _outputs_info = {
@@ -83,7 +84,7 @@ class SMART(OpenWaterComponent):
             # component states
             river_store,
             # component constants
-            rho_water=1e3,
+            rho_water,
             **kwargs):
 
         dt = self.timedelta_in_seconds
