@@ -1,11 +1,12 @@
 import numpy as np
 
-from cm4twc.components import SubSurfaceComponent
+import cm4twc
 from cm4twc.settings import dtype_float
 
 
-class SMART(SubSurfaceComponent):
-    """The Soil Moisture Accounting and Routing for Transport [SMART] model
+class SubSurfaceComponent(cm4twc.components.SubSurfaceComponent):
+    """
+    The Soil Moisture Accounting and Routing for Transport [SMART] model
     (`Mockler et al., 2016`_) is an enhancement of the SMARG (Soil
     Moisture Accounting and Routing with Groundwater) lumped, conceptual
     rainfall–runoff model developed at National University of Ireland,

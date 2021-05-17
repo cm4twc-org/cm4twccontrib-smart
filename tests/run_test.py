@@ -2,9 +2,9 @@ import unittest
 from datetime import datetime, timedelta
 import cm4twc
 
-from smart.surfacelayer import SMART as SMART_sl
-from smart.subsurface import SMART as SMART_ss
-from smart.openwater import SMART as SMART_ow
+from cm4twccontrib.smart import SurfaceLayerComponent
+from cm4twccontrib.smart import SubSurfaceComponent
+from cm4twccontrib.smart import OpenWaterComponent
 
 
 class TestContribution(unittest.TestCase):
@@ -40,7 +40,7 @@ class TestContribution(unittest.TestCase):
         theta_gk = (1066.7332319333473 * 3600, 's')
         theta_rk = (10.640277777777778 * 3600, 's')
 
-        sl = SMART_sl(
+        sl = SurfaceLayerComponent(
             saving_directory='out',
             timedomain=td,
             spacedomain=sd,
@@ -51,7 +51,7 @@ class TestContribution(unittest.TestCase):
             }
         )
 
-        ss = SMART_ss(
+        ss = SubSurfaceComponent(
             saving_directory='out',
             timedomain=td,
             spacedomain=sd,
@@ -68,7 +68,7 @@ class TestContribution(unittest.TestCase):
             }
         )
 
-        ow = SMART_ow(
+        ow = OpenWaterComponent(
             saving_directory='out',
             timedomain=td,
             spacedomain=sd,
