@@ -2,9 +2,9 @@ import unittest
 from datetime import datetime, timedelta
 import cm4twc
 
-from cm4twccontrib.smart import SurfaceLayerComponent
-from cm4twccontrib.smart import SubSurfaceComponent
-from cm4twccontrib.smart import OpenWaterComponent
+from cm4twccontrib.smart import (
+    SurfaceLayerComponent, SubSurfaceComponent, OpenWaterComponent
+)
 
 
 class TestContribution(unittest.TestCase):
