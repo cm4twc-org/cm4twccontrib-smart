@@ -102,10 +102,11 @@ class TestContribution(unittest.TestCase):
             'out/test-smart_openwater_run_records_daily.nc'
         )
 
-        fld_name = 'outgoing_water_volume_transport_along_river_channel'
+        var_name = 'outgoing_water_volume_transport_along_river_channel'
 
         self.assertTrue(
-            from_file[fld_name].equals(from_model[fld_name], verbose=3)
+            from_file[var_name].field.equals(from_model[var_name].field,
+                                             verbose=3)
         )
 
 
