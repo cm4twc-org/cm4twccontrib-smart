@@ -15,6 +15,17 @@ System [GFFS] (`Goswami et al., 2005`_). The SMART model reorganised
 and extended SMARG to provide a basis for water quality modelling by
 separating explicitly the important flow pathways in a catchment.
 
+The surface layer component of SMART consists in meeting the
+potential evapotranspiration demand either with rainfall under
+energy-limited conditions or with soil moisture under water-limited
+conditions. Note, unlike the original SMART model, this component
+calculates the available soil moisture from the soil water stress
+coefficient provided by the sub-surface component - in the original
+SMART model, the available soil moisture is iteratively depreciated
+with soil layer depth. This unavoidable simplification may
+overestimate the soil moisture available compared to the original
+SMART model.
+
 The sub-surface component of SMART comprises the runoff generation
 and land runoff routing processes. This sub-surface component is
 made up of six soil layers of equal depth and five linear reservoirs.
@@ -22,6 +33,9 @@ The six soil layers are vertically connected to allow for percolation
 and evaporation. The five linear reservoirs represent the different
 pathways for land runoff. Note, the river routing of SMART is not
 included in this component.
+
+The open water component of SMART consists in routing the streamflow
+through the river network by means of a linear reservoir.
 
 .. _`Mockler et al., 2016`: https://doi.org/10.1016/j.cageo.2015.08.015
 .. _`Kachroo, 1972`: https://doi.org/10.1016/0022-1694(92)90150-T
