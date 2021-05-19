@@ -23,7 +23,7 @@ class OpenWaterComponent(cm4twc.components.OpenWaterComponent):
     through the river network by means of a linear reservoir.
 
     .. _`Mockler et al., 2016`: https://doi.org/10.1016/j.cageo.2015.08.015
-    .. _`Kachroo, 1972`: https://doi.org/10.1016/0022-1694(92)90150-T
+    .. _`Kachroo, 1992`: https://doi.org/10.1016/0022-1694(92)90150-T
     .. _`O'Connell et al., 1970`: https://doi.org/10.1016/0022-1694(70)90221-0
     .. _`Nash and Sutcliffe, 1970`: https://doi.org/10.1016/0022-1694(70)90255-6
     .. _`Goswami et al., 2005`: https://doi.org/10.5194/hess-9-394-2005
