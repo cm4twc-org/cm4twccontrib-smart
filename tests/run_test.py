@@ -92,6 +92,10 @@ class TestContribution(unittest.TestCase):
             openwater=ow
         )
 
+        model.to_yaml()
+
+        model = cm4twc.Model.from_yaml('out/test-smart.yml')
+
         model.simulate()
 
         from_file = cm4twc.DataSet(
