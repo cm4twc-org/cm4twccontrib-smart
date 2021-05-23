@@ -21,14 +21,15 @@ class SurfaceLayerComponent(cm4twc.components.SurfaceLayerComponent):
     separating explicitly the important flow pathways in a catchment.
 
     The surface layer component of SMART consists in meeting the
-    potential evapotranspiration demand either with rainfall under
-    energy-limited conditions or with soil moisture under water-limited
-    conditions. Note, unlike the original SMART model, this component
-    calculates the available soil moisture from the soil water stress
-    coefficient provided by the sub-surface component - in the original
-    SMART model, the available soil moisture is iteratively depreciated
-    with soil layer depth. This unavoidable simplification may
-    overestimate the soil moisture available compared to the original
+    potential evapotranspiration demand either with rainfall alone under
+    energy-limited conditions or with rainfall and soil moisture under
+    water-limited conditions – throughfall is only generated under
+    energy-limited conditions. Note, unlike the original SMART model,
+    this component calculates the available soil moisture from the soil
+    water stress coefficient provided by the sub-surface component – in
+    the original SMART model, the available soil moisture is iteratively
+    depreciated with soil layer depth. This unavoidable simplification
+    may overestimate the soil moisture available compared to the original
     SMART model.
 
     .. _`Mockler et al., 2016`: https://doi.org/10.1016/j.cageo.2015.08.015
