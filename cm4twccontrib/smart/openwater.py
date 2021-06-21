@@ -116,7 +116,7 @@ class OpenWaterComponent(cm4twc.components.OpenWaterComponent):
             # to exchanger
             {
                 'water_level': 
-                    river_store
+                    river_store[0]
             },
             # component outputs
             {
