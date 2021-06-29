@@ -4,7 +4,7 @@ import cm4twc
 from cm4twc.settings import dtype_float
 
 
-class SubSurfaceComponent(cm4twc.components.SubSurfaceComponent):
+class SubSurfaceComponent(cm4twc.component.SubSurfaceComponent):
     """
     The Soil Moisture Accounting and Routing for Transport [SMART] model
     (`Mockler et al., 2016`_) is an enhancement of the SMARG (Soil

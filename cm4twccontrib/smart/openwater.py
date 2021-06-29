@@ -3,7 +3,7 @@ import numpy as np
 import cm4twc
 
 
-class OpenWaterComponent(cm4twc.components.OpenWaterComponent):
+class OpenWaterComponent(cm4twc.component.OpenWaterComponent):
     """
     The Soil Moisture Accounting and Routing for Transport [SMART] model
     (`Mockler et al., 2016`_) is an enhancement of the SMARG (Soil
