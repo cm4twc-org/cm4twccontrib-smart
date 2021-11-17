@@ -5,20 +5,22 @@ from cm4twc.settings import dtype_float
 
 
 class SurfaceLayerComponent(cm4twc.component.SurfaceLayerComponent):
-    """
-    The Soil Moisture Accounting and Routing for Transport [SMART] model
-    (`Mockler et al., 2016`_) is an enhancement of the SMARG (Soil
-    Moisture Accounting and Routing with Groundwater) lumped, conceptual
-    rainfall–runoff model developed at National University of Ireland,
-    Galway (`Kachroo, 1992`_), and based on the soil layers concept
-    (`O'Connell et al., 1970`_; `Nash and Sutcliffe, 1970`_). Separate
-    soil layers were introduced to capture the decline with soil depth
-    in the ability of plant roots to extract water for evapotranspiration.
-    SMARG was originally developed for flow modelling and forecasting
-    and was incorporated into the Galway Real-Time River Flow Forecasting
-    System [GFFS] (`Goswami et al., 2005`_). The SMART model reorganised
-    and extended SMARG to provide a basis for water quality modelling by
-    separating explicitly the important flow pathways in a catchment.
+    """The Soil Moisture Accounting and Routing for Transport [SMART] model
+    (`Mockler et al., 2016 <https://doi.org/10.1016/j.cageo.2015.08.015>`_)
+    is a bucket-type rainfall-runoff model.
+
+    SMART is an enhancement of the SMARG (Soil Moisture Accounting and
+    Routing with Groundwater) lumped, conceptual rainfall–runoff model
+    developed at National University of Ireland, Galway (`Kachroo, 1992`_),
+    and based on the soil layers concept (`O'Connell et al., 1970`_;
+    `Nash and Sutcliffe, 1970`_). Separate soil layers were introduced
+    to capture the decline with soil depth in the ability of plant roots
+    to extract water for evapotranspiration. SMARG was originally developed
+    for flow modelling and forecasting and was incorporated into the
+    Galway Real-Time River Flow Forecasting System [GFFS]
+    (`Goswami et al., 2005`_). The SMART model reorganised and extended
+    SMARG to provide a basis for water quality modelling by separating
+    explicitly the important flow pathways in a catchment.
 
     The surface layer component of SMART consists in meeting the
     potential evapotranspiration demand either with rainfall alone under
