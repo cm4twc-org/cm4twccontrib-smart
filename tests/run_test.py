@@ -1,5 +1,6 @@
 import unittest
 from datetime import datetime, timedelta
+import cf
 import cm4twc
 
 from cm4twccontrib.smart import (
@@ -24,10 +25,10 @@ class TestContribution(unittest.TestCase):
             longitude_resolution=1
         )
 
+        sd.cell_area = cf.read('in/cell_area.nc').select_field('cell_area')
+
         ds = cm4twc.DataSet(['in/rainfall_flux.nc',
                              'in/potential_water_evapotranspiration_flux.nc'])
-
-        ds2 = cm4twc.DataSet('in/cell_area.nc')
 
         theta_t = (1.0, '1')
         theta_c = (1.0, '1')
@@ -72,7 +73,6 @@ class TestContribution(unittest.TestCase):
             saving_directory='out',
             timedomain=td,
             spacedomain=sd,
-            dataset=ds2,
             parameters={
                 'theta_rk': theta_rk
             },

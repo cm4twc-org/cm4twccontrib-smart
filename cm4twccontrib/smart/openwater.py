@@ -39,13 +39,6 @@ class OpenWaterComponent(cm4twc.component.OpenWaterComponent):
     :copyright: 2020, University College Dublin
     """
 
-    _inputs_info = {
-        'cell_area': {
-            'description': 'surface area of the cell',
-            'units': 'm2',
-            'kind': 'static'
-        }
-    }
     _parameters_info = {
         'theta_rk': {
             'description': 'channel reservoir residence time',
@@ -80,8 +73,6 @@ class OpenWaterComponent(cm4twc.component.OpenWaterComponent):
     def run(self,
             # from exchanger
             surface_runoff, subsurface_runoff, evaporation_openwater,
-            # component inputs
-            cell_area,
             # component parameters
             theta_rk,
             # component states
@@ -112,7 +103,7 @@ class OpenWaterComponent(cm4twc.component.OpenWaterComponent):
         )
 
         # convert [kg m-2 s-1] to [m3 s-1]
-        river_outflow = river_outflow / rho_water * cell_area
+        river_outflow = river_outflow / rho_water * self.spacedomain.cell_area
 
         return (
             # to exchanger

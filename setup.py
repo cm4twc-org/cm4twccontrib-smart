@@ -43,5 +43,11 @@ setup(
         'cm4twc'
     ],
 
+    extras_require={
+        'tests': [
+            'cf-python'
+        ]
+    },
+
     zip_safe=False
 )
