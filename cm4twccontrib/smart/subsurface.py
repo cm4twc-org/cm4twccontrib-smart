@@ -109,7 +109,7 @@ class SubSurfaceComponent(cm4twc.component.SubSurfaceComponent):
                    **kwargs):
 
         # initialise soil layers to be half full
-        soil_layers[-1][:] = theta_z / 6 / 2  # kg m-2
+        soil_layers.set_timestep(-1, theta_z / 6 / 2)  # kg m-2
         
     def run(self,
             # from exchanger
@@ -138,6 +138,10 @@ class SubSurfaceComponent(cm4twc.component.SubSurfaceComponent):
         water_limited = ~energy_limited
 
         # initialise current soil layers to their level at previous step
+        soil_layers = (
+            soil_layers.get_timestep(0),
+            soil_layers.get_timestep(-1)
+        )
         soil_layers[0][:] = soil_layers[-1]
 
         # --------------------------------------------------------------
@@ -270,40 +274,60 @@ class SubSurfaceComponent(cm4twc.component.SubSurfaceComponent):
         # route runoff
 
         # overland
+        overland_store = (
+            overland_store.get_timestep(0),
+            overland_store.get_timestep(-1)
+        )
         overland_runoff = overland_store[-1] / theta_sk
         overland_store[0][:] = (
             overland_store[-1] + overland_flow - overland_runoff * dt
         )
-        overland_store[0] *= overland_store[0] > 0
+        overland_store[0][:] *= overland_store[0] > 0
 
         # drain
+        drain_store = (
+            drain_store.get_timestep(0),
+            drain_store.get_timestep(-1)
+        )
         drain_runoff = drain_store[-1] / theta_sk
         drain_store[0][:] = (
             drain_store[-1] + drain_flow - drain_runoff * dt
         )
-        drain_store[0] *= drain_store[0] > 0
+        drain_store[0][:] *= drain_store[0] > 0
 
         # inter
+        inter_store = (
+            inter_store.get_timestep(0),
+            inter_store.get_timestep(-1)
+        )
         inter_runoff = inter_store[-1] / theta_fk
         inter_store[0][:] = (
             inter_store[-1] + inter_flow - inter_runoff * dt
         )
-        inter_store[0] *= inter_store[0] > 0
+        inter_store[0][:] *= inter_store[0] > 0
 
         # shallow groundwater
+        shallow_gw_store = (
+            shallow_gw_store.get_timestep(0),
+            shallow_gw_store.get_timestep(-1)
+        )
         shallow_gw_runoff = shallow_gw_store[-1] / theta_gk
         shallow_gw_store[0][:] = (
             shallow_gw_store[-1] + shallow_gw_flow
             - shallow_gw_runoff * dt
         )
-        shallow_gw_store[0] *= shallow_gw_store[0] > 0
+        shallow_gw_store[0][:] *= shallow_gw_store[0] > 0
 
         # deep groundwater
+        deep_gw_store = (
+            deep_gw_store.get_timestep(0),
+            deep_gw_store.get_timestep(-1)
+        )
         deep_gw_runoff = deep_gw_store[-1] / theta_gk
         deep_gw_store[0][:] = (
             deep_gw_store[-1] + deep_gw_flow - deep_gw_runoff * dt
         )
-        deep_gw_store[0] *= deep_gw_store[0] > 0
+        deep_gw_store[0][:] *= deep_gw_store[0] > 0
 
         return (
             # to exchanger

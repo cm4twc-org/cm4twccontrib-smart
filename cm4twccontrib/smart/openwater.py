@@ -86,6 +86,10 @@ class OpenWaterComponent(cm4twc.component.OpenWaterComponent):
         total_runoff = surface_runoff + subsurface_runoff
 
         # provisionally calculate river flow
+        river_store = (
+            river_store.get_timestep(0),
+            river_store.get_timestep(-1)
+        )
         river_outflow = river_store[-1] / theta_rk
 
         # provisionally calculate new river store state
