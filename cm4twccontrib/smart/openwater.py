@@ -39,6 +39,11 @@ class OpenWaterComponent(cm4twc.component.OpenWaterComponent):
     :copyright: 2020, University College Dublin
     """
 
+    _inwards = {
+        'surface_runoff_flux_delivered_to_rivers',
+        'net_groundwater_flux_to_rivers'
+    }
+    _outwards = {}
     _parameters_info = {
         'theta_rk': {
             'description': 'channel reservoir residence time',
@@ -72,7 +77,8 @@ class OpenWaterComponent(cm4twc.component.OpenWaterComponent):
 
     def run(self,
             # from exchanger
-            surface_runoff, subsurface_runoff, evaporation_openwater,
+            surface_runoff_flux_delivered_to_rivers, 
+            net_groundwater_flux_to_rivers, 
             # component parameters
             theta_rk,
             # component states
@@ -83,7 +89,10 @@ class OpenWaterComponent(cm4twc.component.OpenWaterComponent):
 
         dt = self.timedelta_in_seconds
 
-        total_runoff = surface_runoff + subsurface_runoff
+        total_runoff = (
+            surface_runoff_flux_delivered_to_rivers 
+            + net_groundwater_flux_to_rivers
+        )
 
         # provisionally calculate river flow
         river_store = (
@@ -111,10 +120,7 @@ class OpenWaterComponent(cm4twc.component.OpenWaterComponent):
 
         return (
             # to exchanger
-            {
-                'water_level': 
-                    river_store[0]
-            },
+            {},
             # component outputs
             {
                 'outgoing_water_volume_transport_along_river_channel': 

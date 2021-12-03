@@ -44,6 +44,15 @@ class SubSurfaceComponent(cm4twc.component.SubSurfaceComponent):
     :copyright: 2020, University College Dublin
     """
 
+    _inwards = {
+        'canopy_liquid_throughfall_and_snow_melt_flux',
+        'transpiration_flux_from_root_uptake'
+    }
+    _outwards = {
+        'soil_water_stress_for_transpiration',
+        'surface_runoff_flux_delivered_to_rivers',
+        'net_groundwater_flux_to_rivers'
+    }
     _parameters_info = {
         'theta_c': {
             'description': 'evaporation decay coefficient',
@@ -113,8 +122,8 @@ class SubSurfaceComponent(cm4twc.component.SubSurfaceComponent):
         
     def run(self,
             # from exchanger
-            transpiration, evaporation_soil_surface,
-            evaporation_ponded_water, throughfall, snowmelt,
+            canopy_liquid_throughfall_and_snow_melt_flux,
+            transpiration_flux_from_root_uptake,
             # component parameters
             theta_c, theta_h, theta_d, theta_s, theta_z, theta_sk,
             theta_fk, theta_gk,
@@ -127,11 +136,10 @@ class SubSurfaceComponent(cm4twc.component.SubSurfaceComponent):
         dt = self.timedelta_in_seconds
 
         # determine excess rain quantity from snowmelt and throughfall fluxes
-        excess_rain = (throughfall + snowmelt) * dt
+        excess_rain = canopy_liquid_throughfall_and_snow_melt_flux * dt
 
         # determine unmet ET quantity from ET fluxes
-        unmet_peva = (transpiration + evaporation_soil_surface +
-                      evaporation_ponded_water) * dt
+        unmet_peva = transpiration_flux_from_root_uptake * dt
 
         # determine limiting conditions
         energy_limited = excess_rain > 0
@@ -332,11 +340,11 @@ class SubSurfaceComponent(cm4twc.component.SubSurfaceComponent):
         return (
             # to exchanger
             {
-                'surface_runoff': 
+                'surface_runoff_flux_delivered_to_rivers':
                     overland_runoff + drain_runoff + inter_runoff,
-                'subsurface_runoff': 
+                'net_groundwater_flux_to_rivers':
                     shallow_gw_runoff + deep_gw_runoff,
-                'soil_water_stress': 
+                'soil_water_stress_for_transpiration':
                     np.sum(soil_layers[0], axis=-1) / theta_z
             },
             # component outputs

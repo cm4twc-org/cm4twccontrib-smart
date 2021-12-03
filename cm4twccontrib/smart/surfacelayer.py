@@ -49,6 +49,13 @@ class SurfaceLayerComponent(cm4twc.component.SurfaceLayerComponent):
     :copyright: 2020, University College Dublin
     """
 
+    _inwards = {
+        'soil_water_stress_for_transpiration'
+    }
+    _outwards = {
+        'canopy_liquid_throughfall_and_snow_melt_flux',
+        'transpiration_flux_from_root_uptake'
+    }
     _inputs_info = {
         'rainfall_flux': {
             'units': 'kg m-2 s-1',
@@ -80,7 +87,7 @@ class SurfaceLayerComponent(cm4twc.component.SurfaceLayerComponent):
 
     def run(self,
             # from exchanger
-            soil_water_stress, water_level,
+            soil_water_stress_for_transpiration,
             # component inputs
             rainfall_flux, potential_water_evapotranspiration_flux,
             # component parameters
@@ -121,7 +128,7 @@ class SurfaceLayerComponent(cm4twc.component.SurfaceLayerComponent):
         )
 
         # provisionally set soil evaporation as total available moisture
-        soil_water = soil_water_stress * theta_z
+        soil_water = soil_water_stress_for_transpiration * theta_z
         max_soil_evaporation = np.where(
             water_limited, soil_water / dt, 0.0
         )
@@ -145,18 +152,10 @@ class SurfaceLayerComponent(cm4twc.component.SurfaceLayerComponent):
         return (
             # to exchanger
             {
-                'throughfall': 
+                'canopy_liquid_throughfall_and_snow_melt_flux':
                     effective_rain,
-                'snowmelt': 
-                    np.zeros(self.spaceshape, dtype_float()),
-                'transpiration': 
-                    np.zeros(self.spaceshape, dtype_float()),
-                'evaporation_soil_surface': 
-                    soil_evaporation,
-                'evaporation_ponded_water': 
-                    np.zeros(self.spaceshape, dtype_float()),
-                'evaporation_openwater': 
-                    np.zeros(self.spaceshape, dtype_float())
+                'transpiration_flux_from_root_uptake':
+                    soil_evaporation
             },
             # component outputs
             {
