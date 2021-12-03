@@ -117,8 +117,9 @@ class SubSurfaceComponent(cm4twc.component.SubSurfaceComponent):
                    inter_store, shallow_gw_store, deep_gw_store,
                    **kwargs):
 
-        # initialise soil layers to be half full
-        soil_layers.set_timestep(-1, theta_z / 6 / 2)  # kg m-2
+        if not self.initialised_states:
+            # initialise soil layers to be half full
+            soil_layers.set_timestep(-1, theta_z / 6 / 2)  # kg m-2
         
     def run(self,
             # from exchanger

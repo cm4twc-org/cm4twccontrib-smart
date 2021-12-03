@@ -73,7 +73,9 @@ class OpenWaterComponent(cm4twc.component.OpenWaterComponent):
                    # component states
                    river_store,
                    **kwargs):
-        pass
+
+        if not self.initialised_states:
+            river_store.set_timestep(-1, 0.)
 
     def run(self,
             # from exchanger
