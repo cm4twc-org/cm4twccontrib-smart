@@ -1,10 +1,9 @@
 import numpy as np
 
-import cm4twc
-from cm4twc.settings import dtype_float
+import unifhy
 
 
-class SurfaceLayerComponent(cm4twc.component.SurfaceLayerComponent):
+class SurfaceLayerComponent(unifhy.component.SurfaceLayerComponent):
     """The Soil Moisture Accounting and Routing for Transport [SMART] model
     (`Mockler et al., 2016 <https://doi.org/10.1016/j.cageo.2015.08.015>`_)
     is a bucket-type rainfall-runoff model.

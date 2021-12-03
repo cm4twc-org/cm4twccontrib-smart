@@ -1,9 +1,9 @@
 import unittest
 from datetime import datetime, timedelta
 import cf
-import cm4twc
+import unifhy
 
-from cm4twccontrib.smart import (
+from unifhycontrib.smart import (
     SurfaceLayerComponent, SubSurfaceComponent, OpenWaterComponent
 )
 
@@ -12,13 +12,13 @@ class TestContribution(unittest.TestCase):
 
     def test_smart(self):
 
-        td = cm4twc.TimeDomain.from_start_end_step(
+        td = unifhy.TimeDomain.from_start_end_step(
             start=datetime(2007, 1, 1, 0, 0, 0),
             end=datetime(2007, 3, 1, 0, 0, 0),
             step=timedelta(hours=1)
         )
 
-        sd = cm4twc.LatLonGrid.from_extent_and_resolution(
+        sd = unifhy.LatLonGrid.from_extent_and_resolution(
             latitude_extent=(51, 52),
             latitude_resolution=1,
             longitude_extent=(0, 1),
@@ -27,7 +27,7 @@ class TestContribution(unittest.TestCase):
 
         sd.cell_area = cf.read('in/cell_area.nc').select_field('cell_area')
 
-        ds = cm4twc.DataSet(['in/rainfall_flux.nc',
+        ds = unifhy.DataSet(['in/rainfall_flux.nc',
                              'in/potential_water_evapotranspiration_flux.nc'])
 
         theta_t = (1.0, '1')
@@ -83,7 +83,7 @@ class TestContribution(unittest.TestCase):
             }
         )
 
-        model = cm4twc.Model(
+        model = unifhy.Model(
             identifier='test-smart',
             config_directory='out',
             saving_directory='out',
@@ -94,15 +94,15 @@ class TestContribution(unittest.TestCase):
 
         model.to_yaml()
 
-        model = cm4twc.Model.from_yaml('out/test-smart.yml')
+        model = unifhy.Model.from_yaml('out/test-smart.yml')
 
         model.simulate()
 
-        from_file = cm4twc.DataSet(
+        from_file = unifhy.DataSet(
             'in/outgoing_water_volume_transport_along_river_channel.nc'
         )
 
-        from_model = cm4twc.DataSet(
+        from_model = unifhy.DataSet(
             'out/test-smart_openwater_run_records_daily.nc'
         )
 

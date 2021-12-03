@@ -1,4 +1,4 @@
-A cm4twc-compliant version of the rainfall-runoff model SMART
+A unifhy-compliant version of the rainfall-runoff model SMART
 -------------------------------------------------------------
 
 The Soil Moisture Accounting and Routing for Transport [SMART] model

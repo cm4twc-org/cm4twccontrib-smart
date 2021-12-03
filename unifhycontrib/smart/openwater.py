@@ -1,9 +1,9 @@
 import numpy as np
 
-import cm4twc
+import unifhy
 
 
-class OpenWaterComponent(cm4twc.component.OpenWaterComponent):
+class OpenWaterComponent(unifhy.component.OpenWaterComponent):
     """The Soil Moisture Accounting and Routing for Transport [SMART] model
     (`Mockler et al., 2016 <https://doi.org/10.1016/j.cageo.2015.08.015>`_)
     is a bucket-type rainfall-runoff model.
