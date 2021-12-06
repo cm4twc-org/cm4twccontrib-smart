@@ -68,6 +68,7 @@ class OpenWaterComponent(unifhy.component.OpenWaterComponent):
             'description': 'streamflow at outlet'
         }
     }
+    _requires_cell_area = True
 
     def initialise(self,
                    # component states
