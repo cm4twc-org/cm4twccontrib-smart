@@ -1,0 +1,22 @@
+{
+    "creators": [
+        {
+            "name": "Thibault Hallouin",
+            "affiliation": "Department of Meteorology, University of Reading, UK",
+            "orcid": "0000-0003-0144-2989"
+        },
+        {
+            "name": "Eva M. Mockler",
+            "affiliation": "Catchment Science and Management Unit, Environmental Protection Agency, Ireland"
+        },
+        {
+            "name": "Michael Bruen",
+            "affiliation": "Dooge Centre for Water Resources Research, University College Dublin, Ireland"
+        }
+    ],
+    "title": "unifhycontrib-smart",
+    "description": "A unifhy-compliant version of the rainfall-runoff model SMART.",
+    "license": {
+        "id": "GPL-3.0"
+    }
+}
