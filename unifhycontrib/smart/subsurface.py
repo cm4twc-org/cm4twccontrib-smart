@@ -119,7 +119,7 @@ class SubSurfaceComponent(unifhy.component.SubSurfaceComponent):
 
         if not self.initialised_states:
             # initialise soil layers to be half full
-            soil_layers.set_timestep(-1, theta_z / 6 / 2)  # kg m-2
+            soil_layers.set_timestep(-1, theta_z[..., np.newaxis] / 6 / 2)  # kg m-2
         
     def run(self,
             # from exchanger
