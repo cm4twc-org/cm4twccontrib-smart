@@ -51,5 +51,5 @@ through the river network by means of a linear reservoir.
     1. Dooge Centre for Water Resources Research, University College Dublin
     2. Department of Meteorology, University of Reading
     3. Ireland's Environmental Protection Agency
-:licence: GPL-3.0
+:licence: GPL-3.0-Clause
 :copyright: 2020, University College Dublin
