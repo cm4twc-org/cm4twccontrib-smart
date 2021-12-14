@@ -1,6 +1,13 @@
 A unifhy-compliant version of the rainfall-runoff model SMART
 -------------------------------------------------------------
 
+.. image:: https://img.shields.io/pypi/v/unifhycontrib-smart?style=flat-square&color=00b0f0
+   :target: https://pypi.python.org/pypi/unifhycontrib-smart
+   :alt: PyPI Version
+.. image:: https://img.shields.io/badge/dynamic/json?url=https://zenodo.org/api/records/5780112&label=doi&query=doi&style=flat-square&color=00b0f0
+   :target: https://zenodo.org/badge/latestdoi/355583432
+   :alt: DOI
+
 The Soil Moisture Accounting and Routing for Transport [SMART] model
 (`Mockler et al., 2016`_) is a bucket-type rainfall-runoff model.
 
