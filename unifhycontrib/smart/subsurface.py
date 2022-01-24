@@ -177,24 +177,24 @@ class SubSurfaceComponent(unifhy.component.SubSurfaceComponent):
             # determine space in layer before reaching full capacity
             layer_space = layer_capacity - layer_level
 
-            enough_water = excess_rain <= layer_space
+            enough_space = excess_rain <= layer_space
 
             # enough space in layer to hold entire excess rain
             layer_level[:] = np.where(
-                energy_limited & enough_water,
+                energy_limited & enough_space,
                 layer_level + excess_rain,
                 layer_level
             )
-            excess_rain[energy_limited & enough_water] = 0.
+            excess_rain[energy_limited & enough_space] = 0.
 
             # not enough space in layer to hold entire excess rain
             layer_level[:] = np.where(
-                energy_limited & ~enough_water,
+                energy_limited & ~enough_space,
                 layer_capacity,
                 layer_level
             )
             excess_rain = np.where(
-                energy_limited & ~enough_water,
+                energy_limited & ~enough_space,
                 excess_rain - layer_space,
                 excess_rain
             )
