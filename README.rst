@@ -63,3 +63,14 @@ through the river network by means of a linear reservoir.
     3. Ireland's Environmental Protection Agency
 :licence: GPL-3.0
 :copyright: 2020, University College Dublin
+:codebase: https://github.com/unifhy-org/unifhycontrib-smart
+
+
+How to install
+~~~~~~~~~~~~~~
+
+This package is available on PyPI, so you can simply run:
+
+.. code-block:: bash
+
+   pip install unifhycontrib-smart

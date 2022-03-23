@@ -46,6 +46,7 @@ class SurfaceLayerComponent(unifhy.component.SurfaceLayerComponent):
         3. Ireland's Environmental Protection Agency
     :licence: GPL-3.0
     :copyright: 2020, University College Dublin
+    :codebase: https://github.com/unifhy-org/unifhycontrib-smart
     """
 
     _inwards = {
